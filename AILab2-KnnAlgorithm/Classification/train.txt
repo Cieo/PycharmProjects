@@ -1,0 +1,7 @@
+documentID emotion words 
+1 1 anger gangster couched in the wood to rob traveler 
+2 1 anger car was completely broken in the accident
+3 2 sad cancer cause countless death because of no known good treatment
+4 2 sad old man was discarded in hospital and fall ill
+5 3 happy national day holiday is coming near
+6 3 happy eat delicious food in restaurant 

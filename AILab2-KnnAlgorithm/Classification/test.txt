@@ -1,0 +1,5 @@
+documentID emotion words 
+1 ? ? old man was in hospital because of cancer
+2 ? ? eat food in good restaurant because holiday is coming
+3 ? ? gangster rob traveler in restaurant
+4 ? ? car was broken in accident in national day
