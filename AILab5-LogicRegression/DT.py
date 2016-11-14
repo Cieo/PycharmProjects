@@ -98,20 +98,11 @@ def readFile(dataPath):
 if __name__ == "__main__":
     trainset = readFile("./data/train.csv")
     testset = readFile("./data/test.csv")
-    # for i in range(1,100):
-    #     # (w, result) = trainWLimit(trainset, i*10, 1/len(trainset))
-    #     (w, result) = trainWLimit(trainset, i*10, 0.0001)
-    #     print(str(i*10)+"-----------------------")
-    #     print(w)
-    #     print(result)
-    #     print(str(i*10)+" result-------------------------")
-    #     predictAll(testset, w)
-    #     print(ratio(testset))
-    i = 1000
-    (w, result) = trainWLimit(trainset, i * 10, 0.0001)
-    print(str(i * 10) + "-----------------------")
-    print(w)
-    print(result)
-    print(str(i * 10) + " result-------------------------")
-    predictAll(testset, w)
-    print(ratio(testset))
+    for i in range(1,100):
+        (w, result) = trainWLimit(trainset, i*10, 1/len(trainset))
+        print(str(i*10)+"-----------------------")
+        print(w)
+        print(result)
+        print("result-------------------------")
+        predictAll(testset, w)
+        print(ratio(testset))
