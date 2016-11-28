@@ -13,7 +13,7 @@ def accumulation(a, b):
 
     return sum
 
-
+# get the gradient
 def getP(x, w):
     s = accumulation(x, w)
     P = 1 / (1 + math.e ** -s)
@@ -35,10 +35,18 @@ class Datacase:
 
 
 def updateW(dataset, w, n):
+    """
+    :param dataset : trainset used to train w
+    :param w : w that need to be update
+    :param n : step of iteration
+    :return: new W
+    """
     newW = [0] * len(w)
     for datacase in dataset:
+        # compute and store the gradient
         for i in range(0, len(w)):
             newW[i] += (getP(datacase.x, w) - datacase.y) * datacase.x[i]
+    # merge the gradient and get a new w
     for i in range(0, len(w)):
         newW[i] *= -n
         newW[i] += w[i]
@@ -49,13 +57,28 @@ def trainWLimit(dataset, limit, n):
     """
     :param dataset : trainset used to train w
     :param limit : time limit of iteration
+    :param n : the step of iteration
     :return: trained w and the accuracy
     """
-
+    # show : when show == 0 , check the accuracy
+    show = 1 / n
     w = [0] * len(dataset[0].x)
+    bestAccuracy = 0
+    # keep updating the w
     while limit > 0:
+        show -= 1
         limit -= 1
         w = updateW(dataset, w, n)
+        # check the accuracy, if it went down, make the step smaller
+        if show < 0:
+            predictAll(dataset, w)
+            ra = ratio(dataset)
+            if ra[0] > bestAccuracy:
+                bestAccuracy = ra[0]
+            else:
+                n /= 2
+                show = 1 / n
+
     predictAll(dataset, w)
     return (w, ratio(dataset))
 
@@ -82,7 +105,7 @@ def ratio(dataset):
     result[0] = (base[0] + base[-1]) / (sum(base))
     result[1] = (base[0]) / (base[0] + base[1]) if (base[0] + base[1]) != 0 else 0
     result[2] = (base[0]) / (base[0] + base[2]) if (base[0] + base[2]) != 0 else 0
-    result[3] = (2 * result[2] * result[1]) / (result[2] * result[1]) if (base[2] * base[1]) != 0 else 0
+    result[3] = (2 * result[2] * result[1]) / (result[2] + result[1]) if (base[2] + base[1]) != 0 else 0
     return result
 
 
@@ -98,17 +121,8 @@ def readFile(dataPath):
 if __name__ == "__main__":
     trainset = readFile("./data/train.csv")
     testset = readFile("./data/test.csv")
-    # for i in range(1,100):
-    #     # (w, result) = trainWLimit(trainset, i*10, 1/len(trainset))
-    #     (w, result) = trainWLimit(trainset, i*10, 0.0001)
-    #     print(str(i*10)+"-----------------------")
-    #     print(w)
-    #     print(result)
-    #     print(str(i*10)+" result-------------------------")
-    #     predictAll(testset, w)
-    #     print(ratio(testset))
-    i = 1000
-    (w, result) = trainWLimit(trainset, i * 10, 0.0001)
+    i = 100
+    (w, result) = trainWLimit(trainset, i * 10, 0.01)
     print(str(i * 10) + "-----------------------")
     print(w)
     print(result)
