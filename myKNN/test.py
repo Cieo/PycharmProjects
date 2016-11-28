@@ -2,6 +2,10 @@ import numpy as np
 import random
 
 
-a = [[1,2],[2,2],[1,3]]
-sorted(a,key=lambda x:x[0])
+def getbigger(x):
+    x[1] += 1
+
+a = [[3,1],[2,2],[1,5]]
+for i in a:
+    i[1] = -1
 print(a)

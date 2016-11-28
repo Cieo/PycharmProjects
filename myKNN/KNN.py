@@ -90,6 +90,17 @@ def read_train(p, path):
             splits = list()
             splits.extend(lines[i].split(','))
             test_data.append(list(float(a) for a in splits))
+        max_col = list()
+        for i in range(np.shape(train_data)[1]):
+            max_col.append(max(list(map(lambda x:x[i],train_data+test_data))))
+            if max_col[-1] == 0:
+                max_col[-1] = 1
+        for line in train_data:
+            for i in range(len(line)):
+                line[i] /= max_col[i]
+        for line in test_data:
+            for i in range(len(line)):
+                line[i] /= max_col[i]
         pos_train = list(filter(get_pos, train_data))
         neg_train = list(filter(get_neg, train_data))
     return pos_train, neg_train, test_data
@@ -98,6 +109,6 @@ def read_train(p, path):
 if __name__ == "__main__":
     pos_train, neg_train, test_data = read_train(0.8, "./train.csv")
     forest = Forest(pos_train, neg_train)
-    forest.bulid_forest(555, 10, 1000)
+    forest.bulid_forest(101, 10, 1000)
     print("Forest built up")
-    forest.predict(test_data, 32)
+    forest.predict(test_data, 71)
