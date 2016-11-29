@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import random
+import multiprocessing
 
 
 class Forest:
@@ -17,16 +18,34 @@ class Forest:
                 Tree(random.sample(range(self.width - 1), attr_num), random.sample(self.train_data, samp_num)))
 
     def predict(self, test_data):
-        pass
+        correct = 0
+        for test_line in test_data:
+            result = list(map(lambda x: x.predict(test_line), self.trees))
+            right = len(list(filter(lambda x: x == 1, result)))
+            error = len(list(filter(lambda x: x == 0, result)))
+            if right > self.tree_num / 2 and test_line[-1] == 1:
+                correct += 1
+            elif error > self.tree_num / 2 and test_line[-1] == 0:
+                correct += 1
+        print(correct / len(test_data))
 
 
 class Tree:
     def __init__(self, attr, train_data):
         self.train_data = train_data
-        self.root = bulid_tree(attr, train_data)
+        self.root = dict()
+        self.attr = attr
+        bulid_tree(self.root, attr, train_data)
 
     def predict(self, test_line):
-        pass
+        root = self.root
+        classes = set(test_line[:-1])
+        while "result" not in root:
+            key = list(set(root.keys()) & classes)
+            if len(key) == 0:
+                return -1
+            root = root[key[0]]
+        return root["result"]
 
 
 def getID3(attr, train_data, entropy):
@@ -63,6 +82,8 @@ def bulid_tree(root, attr, train_data):
             root["result"] = 1
         else:
             root["result"] = 0
+        return
+
     entropy = 0
     if right != 0 and error != 0:
         entropy = -right / size * np.log2(right / size) - error / size * np.log2(error / size)
@@ -73,7 +94,8 @@ def bulid_tree(root, attr, train_data):
 
     best_attr = (sorted(list(map(lambda x: getID3(x, train_data, entropy), attr)), key=lambda x: x[-1])[-1])[0]
     classes = set(map(lambda x: x[best_attr], train_data))
-    attr_copy = list(attr).remove(best_attr)
+    attr_copy = list(attr)
+    attr_copy.remove(best_attr)
     for clas in classes:
         root[clas] = dict()
         bulid_tree(root[clas], attr_copy, list(filter(lambda x: x[best_attr] == clas, train_data)))
@@ -84,30 +106,43 @@ def read_train(p, path):
         lines = f.readlines()
         lines.remove(lines[0])
         divide = math.floor(len(lines) * p)
-        train_data = list()
-        test_data = list()
-        for i in range(divide):
+        data = list()
+        for i in range(len(lines)):
             splits = list()
-            splits.extend(lines[i].split(','))
-            splits[0] = str(round(int(splits[0])/10))
+            splits.extend(lines[i].replace('\n', '').split(','))
+            splits[0] = str(round(int(splits[0]) / 10)) + "age"
+            splits[10] = str(round(int(splits[10]) / 1000)) + "gain"
+            splits[11] = str(round(int(splits[11]) / 1000)) + "loss"
+            splits[12] = str(round(int(splits[12]) / 10)) + "hour"
+            splits[-1] = int(splits[-1])
             splits.remove(splits[2])
-            splits.remove(splits[3])
-            splits.remove(splits[7])
-            train_data.append(splits)
-        for i in range(divide, len(lines)):
-            splits = list()
-            splits.extend(lines[i].split(','))
-            splits[0] = str(round(int(splits[0])/10))
             splits.remove(splits[2])
-            splits.remove(splits[3])
-            splits.remove(splits[7])
-            test_data.append(splits)
+            splits.remove(splits[5])
+            data.append(splits)
+        train_data = random.sample(data, divide)
+        for line in train_data:
+            data.remove(line)
+        test_data = data
+
     return train_data, test_data
 
 
-if __name__ == "__main__":
-    train_data, test_data = read_train(0.8, "./train.csv")
+def run_forest(i):
+    print("test", i)
+    train_data, test_data = read_train(0.9, "./train.csv")
+    print("File read finish!", i)
     forest = Forest(train_data)
-    forest.bulid_forest(101, 10, 1000)
-    print("Forest built up")
-    forest.predict(test_data, 71)
+    forest.bulid_forest(501, 5, 2000)
+    print("Forest built up!", i)
+    forest.predict(test_data)
+    print("Predict finish!", i)
+
+
+if __name__ == "__main__":
+    pool = multiprocessing.Pool()
+    for i in range(5):
+        pool.apply_async(run_forest, (i,))
+    pool.close()
+    pool.join()
+    print()
+    print("Multi process finish!")
