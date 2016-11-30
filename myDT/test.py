@@ -1,9 +1,4 @@
 import random
+import numpy as np
 
-a = [1,2,3,4]
-b = [1,2,3]
-def aa(a,x):
-    a.remove(x)
-map(lambda x:aa(a,x),b)
-aa(a,1)
-print(a)
+a = [1,2,3]

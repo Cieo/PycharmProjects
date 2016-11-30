@@ -110,7 +110,7 @@ def read_train(p, path):
         for i in range(len(lines)):
             splits = list()
             splits.extend(lines[i].replace('\n', '').split(','))
-            splits[0] = str(round(int(splits[0]) / 10)) + "age"
+            splits[0] = str(round(int(splits[0]) / 5)) + "age"
             splits[10] = str(round(int(splits[10]) / 1000)) + "gain"
             splits[11] = str(round(int(splits[11]) / 1000)) + "loss"
             splits[12] = str(round(int(splits[12]) / 10)) + "hour"
@@ -132,17 +132,18 @@ def run_forest(i):
     train_data, test_data = read_train(0.9, "./train.csv")
     print("File read finish!", i)
     forest = Forest(train_data)
-    forest.bulid_forest(501, 5, 2000)
+    forest.bulid_forest(501, 6, 9000)
     print("Forest built up!", i)
     forest.predict(test_data)
     print("Predict finish!", i)
 
 
 if __name__ == "__main__":
-    pool = multiprocessing.Pool()
-    for i in range(5):
-        pool.apply_async(run_forest, (i,))
-    pool.close()
-    pool.join()
-    print()
-    print("Multi process finish!")
+    # pool = multiprocessing.Pool()
+    # for i in range(1):
+    #     pool.apply_async(run_forest, (i,))
+    # pool.close()
+    # pool.join()
+    # print()
+    # print("Multi process finish!")
+    run_forest(0)
