@@ -19,11 +19,12 @@ class Regression:
         self.train_data = train_data
         self.weight = 0
 
-    def train_regression(self, attrs, limit, alpha):
+    def train_regression(self, attrs, limit, alpha, samp_num):
         self.attrs = attrs
-        train_data = np.array(list(map(lambda x: get_attrs(attrs, x), self.train_data)))
-        train_result = np.array(list(map(lambda x: [x[-1]], self.train_data)))
-        weight = 0.0000002 * np.random.random((len(attrs) + 1, 1))
+        train_sample = random.sample(self.train_data, samp_num)
+        train_data = np.array(list(map(lambda x: get_attrs(attrs, x), train_sample)))
+        train_result = np.array(list(map(lambda x: [x[-1]], train_sample)))
+        weight = 0.0000002 * np.random.random((np.shape(train_data)[1], 1))
         for i in range(limit):
             result = train_data.dot(weight)
             error = train_result - result
@@ -32,7 +33,7 @@ class Regression:
                 get_cost(error)
         self.weight = weight
 
-    def predict(self,test_data_in):
+    def predict(self, test_data_in):
         test_data = np.array(list(map(lambda x: get_attrs(self.attrs, x), test_data_in)))
         test_result = np.array(list(map(lambda x: [x[-1]], test_data_in)))
         result = test_data.dot(self.weight)
@@ -64,5 +65,5 @@ def read_train(p, path):
 if __name__ == "__main__":
     train_data, test_data = read_train(0.9, "./train.csv")
     regression = Regression(train_data)
-    regression.train_regression((range(9)), 1000000, 0.00000000000001)
+    regression.train_regression(([0, 1, 2, 3, 4, 5, 6, 7, 8]), 1000000, 0.00000000000001, 100)
     regression.predict(test_data)
