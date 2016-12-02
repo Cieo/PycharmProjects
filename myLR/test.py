@@ -1,5 +1,7 @@
 import random
 import numpy as np
 
-a = np.array([[1,2],[2,3],[3,4]])
-print
+a = np.array([[1, 2], [1, 3]])
+print(list(sum(np.array(a)) / len(a)))
+cluster = [[]]*3
+print(cluster)

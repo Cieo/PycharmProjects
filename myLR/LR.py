@@ -13,6 +13,33 @@ def get_cost(error):
     print(np.sqrt(mse))
 
 
+def get_choice(center, line):
+    line_copy = line
+    line_copy[-1] = 0
+    result = np.array(center).dot(np.array(line_copy).T)
+    max_value = max(result)
+    return (np.argwhere(result == max_value)[0])[0]
+
+
+def get_cluster(train_data, k):
+    center_old = random.sample(train_data, k)
+    center = random.sample(train_data, k)
+    cluster = 0
+    print("center",center)
+    print("centol",center_old)
+    while center != center_old:
+        cluster = [[]]*k
+        print(cluster)
+        center_old = center
+        for line in train_data:
+            cluster[get_choice(center, line)].append(line)
+        center = list(map(lambda x: list(sum(np.array(x)) / len(x)), cluster))
+        print("center",center)
+        print("centol",center_old)
+    print(cluster[0] == cluster[1])
+    return cluster
+
+
 class Regression:
     def __init__(self, train_data):
         self.attrs = 0
@@ -48,12 +75,20 @@ def read_train(p, path):
         lines.remove(lines[0])
         divide = math.floor(len(lines) * p)
         data = list()
-
+        max_value = [-9999] * 9
+        min_value = [9999] * 9
         for i in range(len(lines)):
             splits = list()
             splits.extend(lines[i].replace('\n', '').split(','))
             splits = list(map(lambda x: float(x), splits))
+            for j in range(len(splits) - 1):
+                max_value[j] = max(splits[j], max_value[j])
+                min_value[j] = min(splits[j], min_value[j])
             data.append(splits)
+        for i in range(len(lines)):
+            for j in range((np.shape(data)[1]) - 1):
+                (data[i])[j] = ((data[i])[j] - min_value[j]) / (max_value[j] - min_value[j])
+        get_cluster(data, 3)
         train_data = random.sample(data, divide)
         for line in train_data:
             data.remove(line)
@@ -64,6 +99,7 @@ def read_train(p, path):
 
 if __name__ == "__main__":
     train_data, test_data = read_train(0.9, "./train.csv")
-    regression = Regression(train_data)
-    regression.train_regression(([0, 1, 2, 3, 4, 5, 6, 7, 8]), 1000000, 0.00000000000001, 100)
-    regression.predict(test_data)
+    print("Finish Read!")
+    # regression = Regression(train_data)
+    # regression.train_regression(([0, 1, 2, 3, 4, 5, 6, 7, 8]), 100000000, 0.00001, 10000)
+    # regression.predict(test_data)
