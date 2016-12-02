@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import random
+import multiprocessing
 
 
 class KNN:
@@ -22,6 +23,7 @@ class KNN:
         correct = 0
         for line in test_data:
             new_line = [0] * size
+            print(line)
             for word in line[1]:
                 new_line[self.all_word.index(word)] += 1
             line[1] = new_line
@@ -34,10 +36,11 @@ class KNN:
             predict = sorted(emotions.items(), key=lambda x: x[1])[-1][0]
             if predict == line[0]:
                 correct += 1
-                print("Right!", correct / size)
+                print("Right!")
             else:
                 print("Wrong!")
         print("Test finish!")
+        return correct
 
 
 def get_dist(train_line, test_line):
@@ -69,4 +72,5 @@ if __name__ == "__main__":
     print("Read finish!")
     knn = KNN(all_word, train_data)
     knn.train()
+
     knn.test(10, test_data)

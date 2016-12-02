@@ -18,30 +18,21 @@ def get_dist(x1, x2):
 
 
 def get_choice(center, line):
-    line_copy = line.copy()
-    line_copy[-1] = 0
     result = list(map(lambda x: get_dist(x, line), center))
-    max_value = max(result)
-    return result.index(max_value)
+    min_value = min(result)
+    return result.index(min_value)
 
 
 def get_cluster(train_data, k):
     center_old = random.sample(train_data, k)
     center = random.sample(train_data, k)
-    cluster = 0
-    print("center", center)
-    print("centol", center_old)
     while center != center_old:
-        cluster = [[]] * k
-        print(cluster)
+        cluster = [list() for x in range(k)]
         center_old = center
         for line in train_data:
             cluster[get_choice(center, line)].append(line)
         center = list(map(lambda x: list(sum(np.array(x)) / len(x)), cluster))
-        print("center", center)
-        print("centol", center_old)
-    print(cluster[0] == cluster[1])
-    return center,cluster
+    return center, cluster
 
 
 class Regression:
