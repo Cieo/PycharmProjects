@@ -1,11 +1,6 @@
 import numpy as np
 import random
 
-
-def getbigger(x):
-    x[1] += 1
-
-a = [[3,1],[2,2],[1,5]]
-for i in a:
-    i[1] = -1
-print(a)
+emotions = {"anger": 3, "disgust": 0, "fear": 0, "guilt": 0, "joy": 0, "sadness": 0, "shame": 0}
+predict = sorted(emotions.items(), key=lambda x: x[1])[-1][0]
+print(predict)
