@@ -19,7 +19,6 @@ def get_cluster(train_data, k):
         center_old = center
         for line in train_data:
             cluster[get_choice(center, line)].append(line)
-
         center = list(map(lambda x: list(sum(np.array(x)) / len(x)), cluster))
         print("center", center)
         print("centol", center_old)

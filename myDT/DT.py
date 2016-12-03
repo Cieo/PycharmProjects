@@ -139,11 +139,10 @@ def run_forest(i):
 
 
 if __name__ == "__main__":
-    # pool = multiprocessing.Pool()
-    # for i in range(1):
-    #     pool.apply_async(run_forest, (i,))
-    # pool.close()
-    # pool.join()
-    # print()
-    # print("Multi process finish!")
-    run_forest(0)
+    pool = multiprocessing.Pool()
+    for i in range(5):
+        pool.apply_async(run_forest, (i,))
+    pool.close()
+    pool.join()
+    print()
+    print("Multi process finish!")
