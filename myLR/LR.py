@@ -25,7 +25,7 @@ def get_choice(center, line):
     return result.index(min_value)
 
 
-def get_cluster(train_data, k):
+def train_cluster(train_data, k):
     center_old = random.sample(train_data, k)
     center = random.sample(train_data, k)
     while center != center_old:
@@ -38,15 +38,23 @@ def get_cluster(train_data, k):
     return center, cluster
 
 
+def get_cluster(test_data, center):
+    cluster = [list() for x in range(len(center))]
+    for line in test_data:
+        cluster[get_choice(center, line)].append(line)
+    return cluster
+
+
 class Regression:
     def __init__(self, train_data):
         self.attrs = 0
         self.train_data = train_data
         self.weight = 0
 
-    def train_regression(self, attrs, limit, alpha, samp_num):
+    def train_regression(self, attrs, limit, alpha):
         self.attrs = attrs
-        train_sample = random.sample(self.train_data, samp_num)
+        # train_sample = random.sample(self.train_data, samp_num)
+        train_sample = self.train_data
         train_data = np.array(list(map(lambda x: get_attrs(attrs, x), train_sample)))
         train_result = np.array(list(map(lambda x: [x[-1]], train_sample)))
         weight = 0.0000002 * np.random.random((np.shape(train_data)[1], 1))
@@ -95,17 +103,30 @@ def read_train(p, path):
     with open(path) as f:
         data = json.load(f)
     divide = math.floor(len(data) * p)
-    get_cluster(data, 3)
     train_data = random.sample(data, divide)
     for line in train_data:
         data.remove(line)
     test_data = data
+
+    center, train_data = train_cluster(train_data, 8)
+    test_data = get_cluster(test_data, center)
     return train_data, test_data
+
+
+def run_test(train_data_i, test_data_i):
+    regression = Regression(train_data_i)
+    regression.train_regression(([0, 1, 2, 3, 4, 5, 6, 7, 8]), 1000000, 0.00001)
+    regression.predict(test_data_i)
 
 
 if __name__ == "__main__":
     train_data, test_data = read_train(0.9, "train.json")
     print("Finish Read!")
-    # regression = Regression(train_data)
-    # regression.train_regression(([0, 1, 2, 3, 4, 5, 6, 7, 8]), 100000000, 0.00001, 10000)
-    # regression.predict(test_data)
+
+    pool = multiprocessing.Pool()
+    for i in range(len(train_data)):
+        pool.apply_async(run_test, (train_data[i], test_data[i],))
+    pool.close()
+    pool.join()
+
+    print("Multi processing finish!")

@@ -19,26 +19,14 @@ class Forest:
 
     def predict(self, test_data):
         correct = 0
-        TP = 0
-        FP = 0
-        TN = 0
-        FN = 0
         for test_line in test_data:
             result = list(map(lambda x: x.predict(test_line), self.trees))
             right = len(list(filter(lambda x: x == 1, result)))
             error = len(list(filter(lambda x: x == 0, result)))
-            if right > self.tree_num / 2 and test_line[-1] == 1:
-                correct += 1
-                TP += 1
-            elif error > self.tree_num / 2 and test_line[-1] == 0:
-                correct += 1
-                TN += 1
-            elif right > self.tree_num / 2 and test_line[-1] == 0:
-                FP += 1
-            elif error > self.tree_num / 2 and test_line[-1] == 1:
-                FN += 1
-        # print(correct / len(test_data))
-        print(2 * TP / (2 * TP + FP + FN))
+            if right > self.tree_num / 2:
+                print(1)
+            elif error > self.tree_num / 2:
+                print(0)
 
 
 class Tree:
@@ -112,12 +100,11 @@ def bulid_tree(root, attr, train_data):
         bulid_tree(root[clas], attr_copy, list(filter(lambda x: x[best_attr] == clas, train_data)))
 
 
-def read_train(p, path):
-    with open(path) as f:
+def read_train(train_path, test_path):
+    with open(train_path) as f:
         lines = f.readlines()
         lines.remove(lines[0])
-        divide = math.floor(len(lines) * p)
-        data = list()
+        train_data = list()
         for i in range(len(lines)):
             splits = list()
             splits.extend(lines[i].replace('\n', '').split(','))
@@ -129,31 +116,33 @@ def read_train(p, path):
             splits.remove(splits[2])
             splits.remove(splits[2])
             splits.remove(splits[5])
-            data.append(splits)
-        train_data = random.sample(data, divide)
-        for line in train_data:
-            data.remove(line)
-        test_data = data
+            train_data.append(splits)
+
+    with open(test_path) as f:
+        lines = f.readlines()
+        lines.remove(lines[0])
+        test_data = list()
+        for i in range(len(lines)):
+            splits = list()
+            splits.extend(lines[i].replace('\n', '').split(','))
+            splits[0] = str(round(int(splits[0]) / 5)) + "age"
+            splits[10] = str(round(int(splits[10]) / 1000)) + "gain"
+            splits[11] = str(round(int(splits[11]) / 1000)) + "loss"
+            splits[12] = str(round(int(splits[12]) / 10)) + "hour"
+            splits[-1] = 0
+            splits.remove(splits[2])
+            splits.remove(splits[2])
+            splits.remove(splits[5])
+            test_data.append(splits)
 
     return train_data, test_data
 
 
-def run_forest(i):
-    print("test", i)
-    train_data, test_data = read_train(0.9, "./train.csv")
-    print("File read finish!", i)
+if __name__ == "__main__":
+    train_data, test_data = read_train("./train.csv", "./test.csv")
+    print("File read finish!")
     forest = Forest(train_data)
     forest.bulid_forest(67, 9, 10000)
-    print("Forest built up!", i)
+    print("Forest built up!")
     forest.predict(test_data)
-    print("Predict finish!", i)
-
-
-if __name__ == "__main__":
-    pool = multiprocessing.Pool()
-    for i in range(5):
-        pool.apply_async(run_forest,(i,))
-    pool.close()
-    pool.join()
-    print()
-    print("Finish!")
+    print("Predict finish!")

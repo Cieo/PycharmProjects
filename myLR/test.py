@@ -1,6 +1,7 @@
 import random
 import numpy as np
 
+
 def get_dist(x1, x2):
     return sum(list(map(lambda x: (x1[x] - x2[x]) ** 2, range(len(x1) - 1))))
 
@@ -24,11 +25,7 @@ def get_cluster(train_data, k):
         print("centol", center_old)
     return center, cluster
 
+
 if __name__ == "__main__":
-    a = list()
-    a.append([0,2,3])
-    a.append([0,0,3])
-    a.append([1.5,0,3])
-    a.append([5,0,3])
-    a.append([5,2,3])
-    get_cluster(a,2)
+    a = [1,2,3]
+    print(a[:-1])
