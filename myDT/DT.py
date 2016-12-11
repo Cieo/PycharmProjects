@@ -27,15 +27,15 @@ class Forest:
             result = list(map(lambda x: x.predict(test_line), self.trees))
             right = len(list(filter(lambda x: x == 1, result)))
             error = len(list(filter(lambda x: x == 0, result)))
-            if right > self.tree_num / 2 and test_line[-1] == 1:
+            if right > self.tree_num * 0.4 and test_line[-1] == 1:
                 correct += 1
                 TP += 1
-            elif error > self.tree_num / 2 and test_line[-1] == 0:
+            elif error > self.tree_num * 0.6 and test_line[-1] == 0:
                 correct += 1
                 TN += 1
-            elif right > self.tree_num / 2 and test_line[-1] == 0:
+            elif right > self.tree_num * 0.4 and test_line[-1] == 0:
                 FP += 1
-            elif error > self.tree_num / 2 and test_line[-1] == 1:
+            elif error > self.tree_num * 0.6 and test_line[-1] == 1:
                 FN += 1
         # print(correct / len(test_data))
         print(2 * TP / (2 * TP + FP + FN))
@@ -152,7 +152,7 @@ def run_forest(i):
 if __name__ == "__main__":
     pool = multiprocessing.Pool()
     for i in range(5):
-        pool.apply_async(run_forest,(i,))
+        pool.apply_async(run_forest, (i,))
     pool.close()
     pool.join()
     print()

@@ -23,11 +23,12 @@ class Forest:
             result = list(map(lambda x: x.predict(test_line), self.trees))
             right = len(list(filter(lambda x: x == 1, result)))
             error = len(list(filter(lambda x: x == 0, result)))
-            if right > self.tree_num / 2:
+            if right > self.tree_num * 0.4:
                 print(1)
-            elif error > self.tree_num / 2:
+            elif error > self.tree_num * 0.6:
                 print(0)
-
+            else:
+                print(1)
 
 class Tree:
     def __init__(self, attr, train_data):
@@ -134,7 +135,6 @@ def read_train(train_path, test_path):
             splits.remove(splits[2])
             splits.remove(splits[5])
             test_data.append(splits)
-
     return train_data, test_data
 
 

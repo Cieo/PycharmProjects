@@ -102,7 +102,7 @@ def read_train(train_path, test_path):
             for j in range((np.shape(test_data)[1]) - 1):
                 (test_data[i])[j] = ((test_data[i])[j] - min_value[j]) / (max_value[j] - min_value[j])
 
-    center, train_data = train_cluster(train_data, 8)
+    center, train_data = train_cluster(train_data, 1)
     return center, train_data, test_data
 
 
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     regressions = list()
     for i in range(len(center)):
         regre = Regression(train_data[i])
-        regre.train_regression(([0, 1, 2, 3, 4, 5, 6, 7, 8]), 10000000, 0.00001)
+        regre.train_regression(([0, 1, 2, 3, 4, 5, 6, 7, 8]), 1000000, 0.00001)
         regressions.append(regre)
     print("Finish Train!")
     for line in test_data:

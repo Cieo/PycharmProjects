@@ -62,8 +62,6 @@ class Regression:
             result = train_data.dot(weight)
             error = train_result - result
             weight += alpha * (2 / len(error) * train_data.T.dot(error))
-            if i % 100000 == 0:
-                get_cost(error)
         self.weight = weight
 
     def predict(self, test_data_in):
@@ -72,7 +70,10 @@ class Regression:
         result = test_data.dot(self.weight)
         error = test_result - result
         print("Predict finish!")
-        get_cost(error)
+        # get_cost(error)
+        print(len(test_data_in), "← length of test_data")
+        print(sum(error**2), "← sum of error")
+        return sum(error**2),len(test_data_in)
 
 
 def read_train(p, path):
@@ -108,15 +109,15 @@ def read_train(p, path):
         data.remove(line)
     test_data = data
 
-    center, train_data = train_cluster(train_data, 8)
+    center, train_data = train_cluster(train_data, 4)
     test_data = get_cluster(test_data, center)
     return train_data, test_data
 
 
 def run_test(train_data_i, test_data_i):
     regression = Regression(train_data_i)
-    regression.train_regression(([0, 1, 2, 3, 4, 5, 6, 7, 8]), 1000000, 0.00001)
-    regression.predict(test_data_i)
+    regression.train_regression(([0, 1, 2, 3, 4, 5, 6, 7, 8]), 10000000, 0.00001)
+    return regression.predict(test_data_i)
 
 
 if __name__ == "__main__":
@@ -124,9 +125,15 @@ if __name__ == "__main__":
     print("Finish Read!")
 
     pool = multiprocessing.Pool()
+    result = list()
     for i in range(len(train_data)):
-        pool.apply_async(run_test, (train_data[i], test_data[i],))
+        result.append(pool.apply_async(run_test, (train_data[i], test_data[i],)))
     pool.close()
     pool.join()
-
+    up = 0
+    down = 0
+    for i in result:
+        up += i.get()[0]
+        down += i.get()[1]
+    print(np.sqrt(up/down))
     print("Multi processing finish!")

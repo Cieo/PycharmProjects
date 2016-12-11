@@ -27,5 +27,4 @@ def get_cluster(train_data, k):
 
 
 if __name__ == "__main__":
-    a = [1,2,3]
-    print(a[:-1])
+    print(np.sqrt(32.4))
