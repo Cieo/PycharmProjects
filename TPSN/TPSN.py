@@ -10,6 +10,7 @@ class Node:
         self.time = random.random() * 1000
         self.time_gain = 0.8 + random.random() * 0.2
         self.sync_finish_time_glo = 0
+        self.period_error = 0
 
 
 # 计算两个节点之间的距离
@@ -82,25 +83,100 @@ def sync_time(root):
     finish_time_global = max(list(map(lambda x: x.sync_finish_time_glo, nodes)))
     for node in nodes:
         node.time += convert2selftime(finish_time_global - node.sync_finish_time_glo, node)
+        #     # 输出结果观察
+        #     print(node.time)
+        # print("↑ time_after_sync---------------")
+
+
+def pass_time(root, pass_time_glo):
+    # 统计结果所使用的list，包含所有的节点
+    nodes = list()
+
+    queue = list()
+    queue.append(root)
+
+    while len(queue) != 0:
+        top = queue.pop(0)
+        nodes.append(top)
+
+        # 更新时间
+        top.time += convert2selftime(pass_time_glo, top)
+        for child_node in top.child_nodes:
+            queue.append(child_node)
+
+            # for node in nodes:
+            #     # 输出结果观察
+            #     print(node.time)
+            # print("↑ time_pass_time---------------")
+
+
+def update_error(root, root_time):
+    # 统计结果所使用的list，包含所有的节点
+    nodes = list()
+
+    queue = list()
+    queue.append(root)
+
+    while len(queue) != 0:
+        top = queue.pop(0)
+        nodes.append(top)
+
+        # 更新飘移
+        top.period_error = root_time - top.time
+        for child_node in top.child_nodes:
+            queue.append(child_node)
+
+    for node in nodes:
         # 输出结果观察
-        print(node.time)
+        print(node.period_error)
+    print("↑ period_error---------------")
+
+
+def compensate_error(root):
+    # 统计结果所使用的list，包含所有的节点
+    nodes = list()
+
+    queue = list()
+    queue.append(root)
+
+    while len(queue) != 0:
+        top = queue.pop(0)
+        nodes.append(top)
+
+        # 更新补偿
+        top.time_gain -= top.period_error / 100000
+        for child_node in top.child_nodes:
+            queue.append(child_node)
+
+            # for node in nodes:
+            #     # 输出结果观察
+            #     print(node.period_error)
+            # print("↑ time after compensate---------------")
 
 
 if __name__ == "__main__":
     # 实验中节点的总个数
     num_of_nodes = 5
     nodes = list()
+    random.seed(1)
 
     # 构建实验初始条件
     for i in range(num_of_nodes):
         nodes.append(Node())
         # 输出初始值观察
         print(nodes[-1].time)
-    print("-----------------")
+    print("↑ init_time-----------------")
 
     # 随机选取根节点
     root = random.sample(nodes, 1)[0]
     # 构建拓扑关系
     build_topology(root, nodes)
-    # 进行时间同步
+    # 首次同步
     sync_time(root)
+
+    for i in range(1000):
+        # 周期进行时间同步
+        pass_time(root, 100)
+        update_error(root, root.time)
+        sync_time(root)
+        compensate_error(root)
