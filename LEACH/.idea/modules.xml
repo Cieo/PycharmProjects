@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../DAEA/.idea/DADE.iml" filepath="$PROJECT_DIR$/../DAEA/.idea/DADE.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../LEACH/.idea/LEACH.iml" filepath="$PROJECT_DIR$/../LEACH/.idea/LEACH.iml" />
     </modules>
   </component>
 </project>

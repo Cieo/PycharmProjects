@@ -144,7 +144,7 @@ def compensate_error(root):
         nodes.append(top)
 
         # 更新补偿
-        top.time_gain -= top.period_error / 100000
+        top.time_gain -= top.period_error / 100
         for child_node in top.child_nodes:
             queue.append(child_node)
 
